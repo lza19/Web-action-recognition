@@ -1,0 +1,44 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 900px;
+    height: 950px;
+    background-color: rgba(0, 191, 255, 0.8);
+    border-radius: 10px;
+}
+
+.container-gid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
+
+.BOX1{
+    background-color: lightgreen;
+    height: 150px;
+    width: 860px;
+}
+
+#fileInput {
+    margin: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background-color: tomato;
+}
+
+#videoPlayer {
+    width: 860px;
+    height: 450px;
+    background-color: black;
+}
