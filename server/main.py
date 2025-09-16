@@ -15,7 +15,6 @@ from starlette.background import BackgroundTask
 model_path = os.path.join(os.path.dirname(__file__), 'best.pt') 
 model = YOLO(model_path)
 
-
 # ฟังก์ชันสำหรับประมวลผลวิดีโอไฟล์
 def Videolern(input_path: str, output_path: str):
     cap = cv2.VideoCapture(input_path)
