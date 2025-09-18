@@ -1,47 +1,65 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // เลือก h1 และปุ่ม
-    const myH1 = document.getElementById('myH1');
-    const btn = document.getElementById('btn');
-    const fileInput = document.getElementById('fileInput');
-    const videoPlayer = document.getElementById('videoPlayer');
-    const x = 10;
-    console.log(x);
+const fileInput = document.getElementById("fileInput");
+const videoPlayer = document.getElementById("videoPlayer");
+const logContainer = document.getElementById("logOutput");
+const loadingOverlay = document.getElementById('loadingOverlay');
+console.log(logContainer)
+console.log(videoPlayer)
+let logs = [];
 
-    btn.addEventListener("click", function() {
-        myH1.innerText = "ข้อความเปลี่ยนแล้ว!";
-    });
+fileInput.addEventListener('change', async function () {
+    const file = fileInput.files[0];
+    console.log(file.name)
+    if (!file) return;
+    loadingOverlay.style.display = 'flex';
+    const formData = new FormData();
+    formData.append('file', file);
 
-    fileInput.addEventListener('change', async function() {
-        const file = fileInput.files[0];
-        console.log(file.name);
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        console.log(formData);
-        
-        try {
-            // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
-            const response = await fetch("http://127.0.0.1:8000/process-video", {
-                method: "POST",
-                body: formData
-            });
-            
-            // แปลงข้อมูลที่ได้รับกลับมาเป็น Blob
-            const videoBlob = await response.blob();
-            console.log("Received Blob:", videoBlob);
+    try {
+        // โหลดวิดีโอที่ประมวลผลแล้ว
+        const response = await fetch("http://127.0.0.1:8000/process-video", {
+            method: "POST",
+            body: formData
+        });
 
-            // สร้าง URL ชั่วคราวจาก Blob
-            const videoUrl = URL.createObjectURL(videoBlob);
-            console.log("Created video URL:", videoUrl);
+        const videoBlob = await response.blob();
+        const videoUrl = URL.createObjectURL(videoBlob);
+        videoPlayer.src = videoUrl;
+        videoPlayer.load();
 
-            // นำ URL ไปกำหนดให้ videoPlayer เพื่อแสดงผล
-            videoPlayer.src = videoUrl;
-            videoPlayer.load(); // สั่งให้เริ่มโหลดวิดีโอ
-            
-        } catch (error) {
-            console.error("Error during video processing:", error);
-            // สามารถแสดงข้อความแจ้งเตือนให้ผู้ใช้ทราบได้ที่นี่
-            myH1.innerText = "เกิดข้อผิดพลาดในการประมวลผลวิดีโอ";
+        //log
+        const logRes = await fetch("http://127.0.0.1:8000/get-logs");
+        const logData = await logRes.json();
+        logs = logData.results || [];
+        displayLogs("all");
+
+    } catch (error) {
+        console.error("Error during video processing:", error);
+    }finally {
+            // ซ่อนหน้าโหลดเมื่อเสร็จสิ้น
+            loadingOverlay.style.display = 'none';
+        }
+});
+
+document.getElementById("Logall").addEventListener("click", () => displayLogs("all"));
+document.getElementById("logC").addEventListener("click", () => displayLogs("cheating"));
+document.getElementById("logNC").addEventListener("click", () => displayLogs("non-cheating"));
+
+
+function displayLogs(filterClass) {
+    logContainer.innerHTML = "";
+
+    if (logs.length === 0) {
+        logContainer.innerHTML = "<p>ไม่มีข้อมูล</p>";
+        return;
+    }
+
+    logs.forEach(log => {
+        if (filterClass === "all" || log.class === filterClass) {
+            const p = document.createElement("p");
+            p.textContent = `[${log.time}s] → ${log.class}: ${log.percent}%`;
+            logContainer.appendChild(p);
         }
     });
-});
+}
+
+

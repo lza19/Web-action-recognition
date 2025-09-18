@@ -44,3 +44,360 @@ async def upload_file(file: UploadFile = File(...)):
     print("Content type:", file.content_type)
     return {"filename": file.filename, "content_type": file.content_type}
 
+///////////////
+js
+
+document.addEventListener('DOMContentLoaded', () => {
+    // เลือก h1 และปุ่ม
+    const myH1 = document.getElementById('myH1');
+    const btn = document.getElementById('btn');
+    const fileInput = document.getElementById('fileInput');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const x = 10;
+    console.log(x);
+
+    btn.addEventListener("click", function() {
+        myH1.innerText = "ข้อความเปลี่ยนแล้ว!";
+    });
+
+    fileInput.addEventListener('change', async function() {
+        const file = fileInput.files[0];
+        console.log(file.name);
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        console.log(formData);
+        
+        try {
+            // ส่งคำขอ POST ไปยังเซิร์ฟเวอร์
+            const response = await fetch("http://127.0.0.1:8000/process-video", {
+                method: "POST",
+                body: formData
+            });
+            
+            // แปลงข้อมูลที่ได้รับกลับมาเป็น Blob
+            const videoBlob = await response.blob();
+            console.log("Received Blob:", videoBlob);
+
+            // สร้าง URL ชั่วคราวจาก Blob
+            const videoUrl = URL.createObjectURL(videoBlob);
+            console.log("Created video URL:", videoUrl);
+            
+            // นำ URL ไปกำหนดให้ videoPlayer เพื่อแสดงผล
+            videoPlayer.src = videoUrl;
+            videoPlayer.load(); // สั่งให้เริ่มโหลดวิดีโอ
+            
+        } catch (error) {
+            console.error("Error during video processing:", error);
+            // สามารถแสดงข้อความแจ้งเตือนให้ผู้ใช้ทราบได้ที่นี่
+            myH1.innerText = "เกิดข้อผิดพลาดในการประมวลผลวิดีโอ";
+        }
+    });
+});
+
+๒๒๒๒๒๒๒๒๒๒๒๒
+
+from fastapi import FastAPI, File, UploadFile,WebSocket,Request
+from fastapi.middleware.cors import CORSMiddleware
+import torch
+import cv2
+import os
+from ultralytics import YOLO
+import tempfile
+import shutil
+from pathlib import Path
+from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
+#model = YOLO('best.pt')
+
+#__file__ คือ 'C:\my_project\servers\main.py' และ os.path.dirname(__file__) จะได้ 'C:\my_project\servers' รวมกับ 'best.pt' จะได้ 'C:\my_project\servers\best.pt'
+model_path = os.path.join(os.path.dirname(__file__), 'best.pt') 
+model = YOLO(model_path)
+
+# ฟังก์ชันสำหรับประมวลผลวิดีโอไฟล์
+def Videolern(input_path: str, output_path: str):
+    cap = cv2.VideoCapture(input_path)
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return False, "Could not open video."
+
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        results = model(frame)
+        
+        if results and len(results) > 0:
+            processed_frame = results[0].plot()
+        else:
+            processed_frame = frame
+
+        out.write(processed_frame)
+    
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+    return True, "Processing successful."
+
+# ฟังก์ชันสำหรับลบไฟล์ชั่วคราว (ไม่ใช่ async)
+def cleanup_file(*paths: str):
+    for path in paths:
+        if os.path.exists(path):
+            os.unlink(path)
+ 
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins="http://127.0.0.1:5500",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {"Hello" : "World"}
+
+@app.get("/items/{x}/{y}")
+def read_root(x: int, y: int):
+    z = x + y
+    return {z}
+
+@app.post("/upload/")
+async def upload_file(file: UploadFile = File(...)):
+
+    print("File received:", file.filename)
+    print("Content type:", file.content_type)
+    return {"status": "success"}
+
+@app.post("/process-video")
+async def process_video_endpoint(file: UploadFile = File(...)):
+
+    input_path = None
+    output_path = None
+    
+    try:
+        # ใช้ NamedTemporaryFile โดยไม่ให้ลบทันที
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_input:
+            shutil.copyfileobj(file.file, temp_input)
+            input_path = temp_input.name
+        
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_output:
+            output_path = temp_output.name
+        
+        # Call the processing function
+        success, message = Videolern(input_path, output_path)
+
+        if not success:
+            return {"error": message}
+
+        # สร้าง BackgroundTask เพื่อสั่งลบไฟล์เมื่อ Response ถูกส่งไปแล้ว
+        # ส่งฟังก์ชัน cleanup_file ที่เป็นฟังก์ชันธรรมดา
+        background_task = BackgroundTask(cleanup_file, input_path, output_path)
+        
+        return FileResponse(
+            path=output_path,
+            media_type="video/mp4",
+            filename=f"processed_{file.filename}",
+            background=background_task
+        )
+
+    except Exception as e:
+        # หากเกิดข้อผิดพลาด ให้ลบไฟล์ที่สร้างขึ้นแล้ว
+        if input_path and os.path.exists(input_path):
+            os.unlink(input_path)
+        if output_path and os.path.exists(output_path):
+            os.unlink(output_path)
+        return {"error": f"An error occurred: {e}"}
+
+
+////////////
+
+js
+
+const fileInput = document.getElementById("fileInput");
+const btn = document.getElementById("btn");
+const videoPlayer = document.getElementById("videoPlayer");
+const logContainer = document.getElementById("logOutput");
+
+let logs = [];
+
+fileInput.addEventListener('change', async function () {
+    const file = fileInput.files[0];
+    console.log(file.name);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        // โหลดวิดีโอที่ประมวลผลแล้ว
+        const response = await fetch("http://127.0.0.1:8000/process-video", {
+            method: "POST",
+            body: formData
+        });
+
+        // สร้าง URL ของวิดีโอที่ประมวลผลแล้ว
+        const videoBlob = await response.blob();
+        const videoUrl = URL.createObjectURL(videoBlob);
+        videoPlayer.src = videoUrl;
+        videoPlayer.load();
+
+        // ดึง log
+        const logRes = await fetch("http://127.0.0.1:8000/get-logs");
+        const logData = await logRes.json();
+        logs = logData.results;
+        displayLogs("all");
+
+    } catch (error) {
+        console.error("Error during video processing:", error);
+    }
+});
+
+document.getElementById("Logall").addEventListener("click", () => displayLogs("all"));
+document.getElementById("logC").addEventListener("click", () => displayLogs("C"));
+document.getElementById("logNC").addEventListener("click", () => displayLogs("NC"));
+
+function displayLogs(filterClass) {
+    logContainer.innerHTML = "";
+    let filtered = logs;
+    if (filterClass !== "all") {
+        filtered = logs.filter(l => l.class === filterClass);
+    }
+
+    if (filtered.length === 0) {
+        logContainer.innerHTML = "<p>ไม่มีข้อมูล</p>";
+        return;
+    }
+
+    filtered.forEach(log => {
+        const p = document.createElement("p");
+        p.textContent = `[${log.time}s] → ${log.class}`;
+        logContainer.appendChild(p);
+    });
+}
+
+////
+backend
+
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+import cv2, os, tempfile, shutil
+from ultralytics import YOLO
+from fastapi.responses import FileResponse, JSONResponse
+from starlette.background import BackgroundTask
+
+model_path = os.path.join(os.path.dirname(__file__), "best.pt")
+model = YOLO(model_path)
+
+# เก็บ log ชั่วคราว
+last_logs = []
+
+def Videolern(input_path: str, output_path: str):
+    global last_logs
+    last_logs = []  # reset log ทุกครั้ง
+
+    cap = cv2.VideoCapture(input_path)
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return False, "Could not open video."
+
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        current_frame = cap.get(cv2.CAP_PROP_POS_FRAMES)
+        timestamp = current_frame / fps
+
+        results = model(frame)
+
+        if results and len(results) > 0:
+            for box in results[0].boxes:
+                cls_id = int(box.cls.cpu().numpy())
+                cls_name = model.names[cls_id]
+                last_logs.append({
+                    "time": f"{timestamp:.2f}",
+                    "class": cls_name
+                })
+            processed_frame = results[0].plot()
+        else:
+            processed_frame = frame
+
+        out.write(processed_frame)
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+    return True, "Processing successful."
+
+def cleanup_file(*paths: str):
+    for path in paths:
+        if os.path.exists(path):
+            os.unlink(path)
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:5500"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+@app.post("/process-video")
+async def process_video_endpoint(file: UploadFile = File(...)):
+    input_path = None
+    output_path = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_input:
+            shutil.copyfileobj(file.file, temp_input)
+            input_path = temp_input.name
+
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_output:
+            output_path = temp_output.name
+
+        success, message = Videolern(input_path, output_path)
+        if not success:
+            return {"error": message}
+
+        background_task = BackgroundTask(cleanup_file, input_path, output_path)
+
+        return FileResponse(
+            path=output_path,
+            media_type="video/mp4",
+            filename=f"processed_{file.filename}",
+            background=background_task
+        )
+
+    except Exception as e:
+        if input_path and os.path.exists(input_path):
+            os.unlink(input_path)
+        if output_path and os.path.exists(output_path):
+            os.unlink(output_path)
+        return {"error": f"An error occurred: {e}"}
+
+# endpoint แยกสำหรับดึง log
+@app.get("/get-logs")
+async def get_logs():
+    return JSONResponse(content={"results": last_logs})

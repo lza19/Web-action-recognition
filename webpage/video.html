@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css\main.css">
 </head>
+
 <body>
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
+    <div class="spinner"></div>
+    <p style="margin-top: 10px;">กำลังประมวลผลวิดีโอ...</p>
+    </div>
+
     <div class="container">
 
         <h1 id="myH1">Hello World</h1>
         <input type="file" id="fileInput" accept="video/*">
-        <button id="btn">กดเพื่อเปลี่ยนข้อความ</button>
+        <!--<button id="btn">กดเพื่อเปลี่ยนข้อความ</button>-->
 
         <div class="container-gid">
             <video id="videoPlayer" controls></video>
+            <ul>
             <li>
-                <button id="Logall">Logall</button>
-                <button id="logC">logC</button>
-                <button id="logNC">logNC</button>
+                <button id="Logall">Log ทั้งหมด</button>
             </li>
+            <li>
+                <button id="logC">Log Cheating</button>
+            </li>
+            <li>
+                <button id="logNC">Log Non-Cheating</button>
+            </li>
+            </ul>
 
             <div id="logOutput"
-                style="width: 840px; height: 200px; overflow-y: auto; border: 1px solid gray; padding: 8px; background: #f9f9f9;">
+                style="width: 840px; height: 160px; overflow-y: auto; border: 1px solid gray; padding: 8px; background: #f9f9f9;">
             </div>
 
         </div>
