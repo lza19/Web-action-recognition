@@ -4,98 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>การเฝ้าระวังแบบเรียลไทม์</title>
-    <link rel="stylesheet" href="css\realtime.css">
+    <link rel="stylesheet" href="css/realtime.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-
-<<<<<<< HEAD
-    <div class="container">
-        <h1 id="myH1">Real Tddime</h1>
-        <div class="button-container">
-            <button id="Start">Start</button>
-            <button id="Stop">Stop</button>
-            <button id="download">download</button>
-            <div class="container-gid">
-                <video id="videoPlayer" controls></video>
-                <li>
-                    <button id="Logall">Logall</button>
-                    <button id="logC">logC</button>
-                    <button id="logNC">logNC</button>
-                </li>
-                <div id="logOutput"
-                    style="width: 840px; height: 200px; overflow-y: auto; border: 1px solid gray; padding: 8px; background: #f9f9f9;">
-                </div>
-=======
-
   <div class="container">
     <header>
       <div class="controls">
-        <button class="btn start"><i class="fas fa-play"></i> เริ่ม</button>
-        <button class="btn stop"><i class="fas fa-pause"></i> หยุด</button>
-        <button class="btn record"><i class="fas fa-download"></i> บันทึก</button>
+        <button id="Start" class="btn start"><i class="fas fa-play"></i> เริ่ม</button>
+        <button id="Stop" class="btn stop"><i class="fas fa-pause"></i> หยุด</button>
+        <button id="download" class="btn record"><i class="fas fa-download"></i> ดาวน์โหลด</button>
       </div>
       <h1>การเฝ้าระวังแบบเรียลไทม์</h1>
     </header>
->>>>>>> dbdb55b1696155776030896210e72b1deaca5bdb
 
     <section class="video-section">
-      <div class="video-placeholder">
-        <i class="fas fa-video"></i>
-        <p>วิดีโอเฝ้าระวังสด</p>
-      </div>
+      <video id="videoPlayer" autoplay playsinline muted></video>
     </section>
 
     <section class="main-content">
       <div class="log-details">
         <h2>รายละเอียดบันทึก</h2>
         <div class="tabs">
-          <button class="tab active">ทั้งหมด</button>
-          <button class="tab red">ทุจริต</button>
-          <button class="tab" disabled>ไม่ทุจริต</button>
+          <button id="Logall" class="tab active">ทั้งหมด</button>
+          <button id="logC" class="tab red">ทุจริต</button>
+          <button id="logNC" class="tab">ไม่ทุจริต</button>
         </div>
-        <ul class="log-list">
-          <li>
-            <span class="tag red">ทุจริต</span>
-            <span>การเคลื่อนไหวที่น่าสงสัย</span>
-            <time datetime="2023-10-27T14:35:12">2023-10-27 14:35:12 น.</time>
-          </li>
-          <li>
-            <span class="tag red">ทุจริต</span>
-            <span>ตรวจพบวัตถุต้องสงสัย</span>
-            <time datetime="2023-10-27T14:36:01">2023-10-27 14:36:01 น.</time>
-          </li>
-          <li>
-            <span class="tag red">ทุจริต</span>
-            <span>การมองออกนอกจอช้าๆ</span>
-            <time datetime="2023-10-27T14:37:33">2023-10-27 14:37:33 น.</time>
-          </li>
-          <li>
-            <span class="tag">ไม่ทุจริต</span>
-            <span>กิจกรรมปกติ</span>
-            <time datetime="2023-10-27T14:38:05">2023-10-27 14:38:05 น.</time>
-          </li>
+        <ul class="log-list" id="log-list">
+          <!-- log จะถูก append ที่นี่ -->
         </ul>
       </div>
 
       <div class="summary-cards">
         <div class="card">
           <h3>การตรวจจับทั้งหมด</h3>
-          <p class="number blue">11</p>
+          <p id="totalDetections" class="number blue">0</p>
           <i class="fas fa-list-alt icon blue"></i>
         </div>
         <div class="card">
           <h3>อัตราการทุจริต</h3>
-          <p class="number red">63.64%</p>
+          <p id="fraudRate" class="number red">0%</p>
           <i class="fas fa-exclamation-triangle icon red"></i>
         </div>
         <div class="card">
           <h3>เหตุการณ์การทุจริต</h3>
-          <p class="number red">7</p>
+          <p id="fraudEvents" class="number red">0</p>
           <i class="fas fa-user-friends icon red"></i>
         </div>
         <div class="card">
           <h3>เหตุการณ์ปกติ</h3>
-          <p class="number green">4</p>
+          <p id="normalEvents" class="number green">0</p>
           <i class="fas fa-check-circle icon green"></i>
         </div>
       </div>
@@ -107,16 +65,9 @@
         <a href="#">กฎหมาย</a>
         <a href="#">ติดต่อเรา</a>
       </nav>
-      <div class="social-icons">
-        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-      </div>
     </footer>
   </div>
-    
-    <script src="scriptsreal.js"> </script>
-    
+  
+    <script src="scriptsreal.js"></script>
 </body>
 </html>
-
