@@ -48,9 +48,6 @@ def Videolern(input_path: str, output_path: str):
                     "class": class_name,
                     "percent": percent
                 })
-
-
-
         else:
             processed_frame = frame
 
@@ -112,3 +109,6 @@ async def process_video_endpoint(file: UploadFile = File(...)):
 @app.get("/get-logs")
 async def get_logs():
     return JSONResponse({"results": log_list})
+
+
+
