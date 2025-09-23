@@ -7,7 +7,7 @@ from ultralytics import YOLO
 
 model_path = os.path.join(os.path.dirname(__file__), 'best.pt') 
 model = YOLO(model_path)
-
+model.info()
 log_list = []
 
 def Videolern(input_path: str, output_path: str):
