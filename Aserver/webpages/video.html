@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Recognition System</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px;">กำลังประมวลผลวิดีโอ...</p>
+    </div>
+
+    <div class="container">
+        <button id="backBtn">ย้อนกลับ</button>
+        <h1 id="myH1">Video Recognition System</h1>
+        <input type="file" id="fileInput" accept="video/*">
+
+        <div class="container-gid">
+            <!-- วิดีโอที่ประมวลผลแล้ว -->
+            <video id="videoPlayer" controls style="display:none;"></video>
+            
+            <!-- ตารางแสดง Logs -->
+            <div id="logOutput"
+                style="width: 100%; max-height: 400px; overflow-y: auto; border: 1px solid gray; padding: 8px; background: #f9f9f9; border-radius: 8px;">
+            </div>
+
+            <!-- กราฟสถิติ -->
+            <div id="statisticsSection" style="display: none; margin-top: 30px;">
+                <h2 style="color: #000000; text-align: center; margin-bottom: 20px;">
+                    สถิติการตรวจจับการโกง
+                </h2>
+                
+                <!-- กราฟแท่ง -->
+                <div id="chartContainer" 
+                    style="padding: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <div id="barChart" 
+                        style="display: flex; align-items: flex-end; justify-content: space-around; height: 300px; border-bottom: 2px solid #333; padding: 20px; gap: 10px;">
+                    </div>
+                </div>
+                
+                <!-- สรุปสถิติ -->
+                <div id="summaryStats" 
+                    style="margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+
+    <script src="js/video.js"></script>
+</body>
+</html>

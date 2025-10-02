@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การเฝ้าระวังแบบเรียลไทม์</title>
+    <link rel="stylesheet" href="css/realtime.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="controls">
+        <button id="Start" class="btn start"><i class="fas fa-play"></i> เริ่มกล้อง</button>
+        <button id="Stop" class="btn stop"><i class="fas fa-pause"></i> หยุดกล้อง</button>
+        <button id="toggleDetection" class="btn detection"><i class="fas fa-eye"></i> เริ่มตรวจจับ</button>
+        <button id="download" class="btn record"><i class="fas fa-download"></i> ดาวน์โหลด</button>
+      </div>
+      <h1>การเฝ้าระวังแบบเรียลไทม์</h1>
+    </header>
+
+    <!-- ย้ายข้อมูลสถานะมาแสดงระหว่างหัวข้อกับวิดีโอ -->
+    <div class="status-info">
+      <div class="camera-status">
+        <span id="currentCamera">กล้อง: ไม่ได้เชื่อมต่อ</span>
+      </div>
+      <div class="server-status">
+        <span id="serverStatus">Server: ไม่ได้เชื่อมต่อ</span>
+      </div>
+    </div>
+
+    <section class="video-section">
+      <video id="videoPlayer" autoplay playsinline muted></video>
+    </section>
+
+    <section class="main-content">
+      <div class="log-details">
+        <h2>รายละเอียดบันทึก</h2>
+        <div class="tabs">
+          <button id="Logall" class="tab active">ทั้งหมด</button>
+          <button id="logC" class="tab red">ทุจริต</button>
+          <button id="logNC" class="tab green">ปกติ</button>
+        </div>
+        <ul class="log-list" id="log-list">
+          <!-- log จะถูก append ที่นี่ -->
+        </ul>
+      </div>
+
+      <div class="summary-cards">
+        <div class="card">
+          <h3>ผู้ใช้ในปัจจุบัน</h3>
+          <p id="totalDetections" class="number blue">0</p>
+          <i class="fas fa-users icon blue"></i>
+        </div>
+        <div class="card">
+          <h3>อัตราความเสี่ยง</h3>
+          <p id="fraudRate" class="number red">0%</p>
+          <i class="fas fa-exclamation-triangle icon red"></i>
+        </div>
+        <div class="card">
+          <h3>การทุจริต</h3>
+          <p id="fraudEvents" class="number red">0</p>
+          <i class="fas fa-ban icon red"></i>
+        </div>
+        <div class="card">
+          <h3>เหตุการณ์ปกติ</h3>
+          <p id="normalEvents" class="number green">0</p>
+          <i class="fas fa-check-circle icon green"></i>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <nav>
+        <a href="#">ทรัพยากร</a>
+        <a href="#">กฎหมาย</a>
+        <a href="#">ติดต่อเรา</a>
+      </nav>
+    </footer>
+  </div>
+  
+    <!-- JSZip Library for creating ZIP folders -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/realtime.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Register Face</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    height: 100vh; /* เต็มหน้าจอ */
+    display: flex;
+    justify-content: center; /* กึ่งกลางแนวตั้ง */
+    align-items: center;     /* กึ่งกลางแนวนอน */
+    background: #f9f9f9;
+    padding: 0 20px;
+  }
+
+  .container {
+    text-align: center; /* เนื้อหาอยู่ตรงกลาง */
+    padding: 20px 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    max-width: 500px; /* จำกัดความกว้าง */
+    width: 100%;
+  }
+
+  #snapshots {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    justify-content: center; /* ให้รูปตรงกลาง */
+  }
+
+  #snapshots img {
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+    border: 1px solid gray;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  input, button {
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+  }
+
+  button {
+    background-color: #7b7b7b;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Register Face (Upload Image)</h2>
+
+    <label>ชื่อ: <input type="text" id="username"></label><br><br>
+
+    <input type="file" id="fileInput" accept="image/*" multiple><br><br>
+    <button id="submit">Submit</button>
+    <a href="video.html">
+    <button id="nextBtn">ไปหน้าต่อไป</button>
+    </a>
+
+    <div id="snapshots"></div>
+  </div>
+
+  <script src="js/reister.js"></script>
+  
+</body>
+</html>

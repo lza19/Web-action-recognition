@@ -1,5 +1,14 @@
-fastapi
-uvicorn[standard]
-ultralytics
-torch
-opencv-python
+python 3.10.9
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu129
+pip install "numpy<2,>=1.23.5"
+pip install tensorflow==2.10
+pip install opencv-python==4.7.0.68
+pip install ultralytics
+pip install fastapi
+pip install "uvicorn[standard]"
+pip install python-multipart
+pip install python-dotenv
+pip install supabase 
+
+
+pip install face-recognition
